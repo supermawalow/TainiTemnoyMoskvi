@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Запись на квест - Тайны Тёмной Москвы</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Тайны Тёмной Москвы</h1>
+        </div>
+        <nav class="main-nav">
+            <a href="index.html">Главная</a>
+            <a href="quiz.html">Начать Квиз</a>
+            <a href="register.html">Записаться на Квест</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="quiz-container">
+            <h2>Запись на реальный квест</h2>
+            <p style="margin-bottom: 2rem;">Прошел квиз? Готов к настоящему приключению? Заполни форму и мы свяжемся с тобой!</p>
+            
+            <form id="registration-form">
+                <div class="form-group">
+                    <label for="name">Твоё имя:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="contact">Телефон или Email:</label>
+                    <input type="text" id="contact" name="contact" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="date">Предпочтительная дата:</label>
+                    <select id="date" name="date" required>
+                        <option value="">Выбери дату</option>
+                        <option value="weekend">Выходные</option>
+                        <option value="weekday">Будни</option>
+                        <option value="any">Любой день</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="cta-button">Отправить заявку</button>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2024 Тайны Тёмной Москвы. Создано с 💀</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script src="js/form.js"></script>
+</body>
+</html>

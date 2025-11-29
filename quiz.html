@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Квиз - Тайны Тёмной Москвы</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Тайны Тёмной Москвы</h1>
+        </div>
+        <nav class="main-nav">
+            <a href="index.html">Главная</a>
+            <a href="quiz.html">Начать Квиз</a>
+            <a href="register.html">Записаться на Квест</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="quiz-container">
+            <h2>Проверь свои знания московских страшилок!</h2>
+            <p style="margin-bottom: 2rem; color: #ccc;">Ответь на все вопросы и узнай, готов ли ты к реальному приключению</p>
+            
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            
+            <div class="question" id="question">
+                <!-- Вопрос будет загружен через JavaScript -->
+            </div>
+            
+            <div class="answers" id="answers">
+                <!-- Варианты ответов будут добавлены через JavaScript -->
+            </div>
+            
+            <button class="next-btn hidden" id="next-btn" onclick="nextQuestion()">
+                Следующий вопрос
+            </button>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2024 Тайны Тёмной Москвы. Создано с 💀</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script src="js/quiz.js"></script>
+</body>
+</html>
