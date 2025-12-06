@@ -460,3 +460,48 @@ footer {
         min-width: 100%;
     }
 }
+/* Добавьте в конец файла style.css */
+
+/* Анимация пульсации для правильного ответа */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Стиль для кнопки звука */
+.sound-btn {
+    transition: all 0.3s ease !important;
+}
+
+.sound-btn:hover {
+    background: rgba(255,255,255,0.2) !important;
+    transform: scale(1.1) !important;
+}
+
+/* Анимация для вопросов */
+.question {
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Анимация для ответов */
+.answer-btn {
+    animation: slideIn 0.3s ease;
+    animation-fill-mode: both;
+}
+
+.answer-btn:nth-child(1) { animation-delay: 0.1s; }
+.answer-btn:nth-child(2) { animation-delay: 0.2s; }
+.answer-btn:nth-child(3) { animation-delay: 0.3s; }
+.answer-btn:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
