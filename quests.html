@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Выбор квеста - Тайны Тёмной Москвы</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .quests-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .quest-card {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .quest-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .quest-image {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .quest-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(45deg, #ff0080, #00ffcc);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
+        .quest-content {
+            padding: 1.5rem;
+        }
+        
+        .quest-title {
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #00ffcc, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .quest-description {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        
+        .quest-details {
+            display: flex;
+            justify-content: space-between;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .quest-detail {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .quest-filter {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.7rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn.active {
+            background: linear-gradient(45deg, rgba(255, 0, 128, 0.3), rgba(0, 255, 204, 0.3));
+            border-color: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+        
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Тайны Тёмной Москвы</h1>
+        </div>
+        <nav class="main-nav">
+            <a href="index.html">Главная</a>
+            <a href="quiz.html">Начать Квиз</a>
+            <a href="quests.html">Выбрать Квест</a>
+            <a href="register.html">Записаться</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="hero">
+            <h2>Выбери свой ужас</h2>
+            <p>Каждый квест — уникальное путешествие в самое сердце московских легенд</p>
+            
+            <div class="quest-filter">
+                <button class="filter-btn active" onclick="filterQuests('all')">Все квесты</button>
+                <button class="filter-btn" onclick="filterQuests('scary')">Очень страшные</button>
+                <button class="filter-btn" onclick="filterQuests('medium')">Средняя сложность</button>
+                <button class="filter-btn" onclick="filterQuests('easy')">Для новичков</button>
+                <button class="filter-btn" onclick="filterQuests('group')">Групповые</button>
+                <button class="filter-btn" onclick="filterQuests('solo')">Одиночные</button>
+            </div>
+        </div>
+
+        <div class="quests-grid" id="quests-grid">
+            <!-- Квесты будут загружены через JavaScript -->
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2025 Тайны Тёмной Москвы. Создано с 💀</p>
+        <p> BY MEOWLENTII </p>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script src="js/quests.js"></script>
+</body>
+</html>
