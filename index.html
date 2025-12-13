@@ -5,6 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Тайны Тёмной Москвы</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .cta-button.secondary {
+            background: linear-gradient(45deg, rgba(0, 255, 204, 0.6), rgba(255, 0, 128, 0.6));
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .cta-button.secondary:hover {
+            background: linear-gradient(45deg, rgba(0, 255, 204, 0.8), rgba(255, 0, 128, 0.8));
+            transform: translateY(-3px);
+            box-shadow: 
+                0 15px 35px rgba(0, 255, 204, 0.4),
+                0 5px 15px rgba(255, 0, 128, 0.3);
+        }
+    </style>
 </head>
 <body>
     <!-- Шапка сайта -->
@@ -15,7 +37,8 @@
         <nav class="main-nav">
             <a href="index.html">Главная</a>
             <a href="quiz.html">Начать Квиз</a>
-            <a href="register.html">Записаться на Квест</a>
+            <a href="quests.html">Выбрать Квест</a>
+            <a href="register.html">Записаться</a>
         </nav>
     </header>
 
@@ -24,7 +47,11 @@
         <section class="hero">
             <h2>Добро пожаловать в мир московских тайн</h2>
             <p>Москва хранит тысячи страшных легенд и загадок. Проверь, достаточно ли ты смел, чтобы разгадать их все...</p>
-            <button class="cta-button" onclick="startQuiz()">Начать Квиз</button>
+            
+            <div class="hero-buttons">
+                <button class="cta-button" onclick="startQuiz()">Начать Квиз</button>
+                <button class="cta-button secondary" onclick="chooseQuest()">Выбрать Квест</button>
+            </div>
         </section>
 
         <section class="features">
@@ -52,4 +79,3 @@
     <script src="js/script.js"></script>
 </body>
 </html>
-
