@@ -5,6 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Запись на квест - Тайны Тёмной Москвы</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: #ffffff;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #ff0080;
+            box-shadow: 0 0 20px rgba(255, 0, 128, 0.3);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .quest-info {
+            background: rgba(255,255,255,0.05);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #ff0080;
+        }
+
+        .quest-info h3 {
+            margin-bottom: 0.5rem;
+            color: #00ffcc;
+        }
+
+        .quest-details-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .back-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -14,14 +76,21 @@
         <nav class="main-nav">
             <a href="index.html">Главная</a>
             <a href="quiz.html">Начать Квиз</a>
-            <a href="register.html">Записаться на Квест</a>
+            <a href="quests.html">Выбрать Квест</a>
+            <a href="register.html">Записаться</a>
         </nav>
     </header>
 
     <main>
         <div class="quiz-container">
-            <h2>Запись на реальный квест</h2>
-            <p style="margin-bottom: 2rem;">Прошел квиз? Готов к настоящему приключению? Заполни форму и мы свяжемся с тобой!</p>
+            <div id="selected-quest-info">
+                <!-- Информация о выбранном квесте будет здесь -->
+            </div>
+            
+            <h2>Запись на квест</h2>
+            <p style="margin-bottom: 2rem;" id="quest-description">
+                Прошел квиз? Готов к настоящему приключению? Заполни форму и мы свяжемся с тобой!
+            </p>
             
             <form id="registration-form">
                 <div class="form-group">
@@ -44,8 +113,22 @@
                     </select>
                 </div>
                 
+                <div class="form-group">
+                    <label for="participants">Количество участников:</label>
+                    <input type="number" id="participants" name="participants" min="1" max="10" value="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="comment">Дополнительные пожелания:</label>
+                    <textarea id="comment" name="comment" rows="3" placeholder="Особые требования, аллергии, etc..."></textarea>
+                </div>
+                
                 <button type="submit" class="cta-button">Отправить заявку</button>
             </form>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="back-button" onclick="goToQuests()">← Выбрать другой квест</button>
+            </div>
         </div>
     </main>
 
@@ -56,6 +139,67 @@
 
     <script src="js/script.js"></script>
     <script src="js/form.js"></script>
-</body>
+    <script>
+        // Функция для отображения выбранного квеста
+        function displaySelectedQuest() {
+            const quest = loadFromLocalStorage('selectedQuest');
+            const container = document.getElementById('selected-quest-info');
+            const description = document.getElementById('quest-description');
+            
+            if (quest && container) {
+                container.innerHTML = `
+                    <div class="quest-info">
+                        <h3>${quest.title}</h3>
+                        <p style="color: rgba(255,255,255,0.8); margin-bottom: 0.5rem;">${quest.description}</p>
+                        <div class="quest-details-row">
+                            <span>⏱️ ${quest.duration}</span>
+                            <span>👥 ${quest.players}</span>
+                            <span>⭐ ${quest.rating}/5</span>
+                            <span style="color: #ff0080; font-weight: bold;">${quest.price}</span>
+                        </div>
+                    </div>
+                `;
+                
+                if (description) {
+                    description.textContent = `Запись на квест: "${quest.title}"`;
+                }
+                
+                // Добавляем скрытое поле с ID квеста
+                const form = document.getElementById('registration-form');
+                if (form) {
+                    const questIdField = document.createElement('input');
+                    questIdField.type = 'hidden';
+                    questIdField.name = 'questId';
+                    questIdField.value = quest.id;
+                    form.appendChild(questIdField);
+                }
+            } else {
+                // Если квест не выбран, показываем сообщение
+                if (container) {
+                    container.innerHTML = `
+                        <div style="background: rgba(255,0,0,0.1); padding: 1rem; border-radius: 10px; margin-bottom: 2rem; text-align: center;">
+                            <p style="color: #ff6666;">⚠️ Квест не выбран</p>
+                            <button onclick="goToQuests()" class="back-button" style="margin-top: 0.5rem;">
+                                ← Выбрать квест
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        }
 
+        // Функция возврата к выбору квеста
+        function goToQuests() {
+            playSound('click');
+            setTimeout(() => {
+                window.location.href = 'quests.html';
+            }, 100);
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            displaySelectedQuest();
+        });
+    </script>
+</body>
 </html>
