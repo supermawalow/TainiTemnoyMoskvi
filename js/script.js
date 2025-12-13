@@ -62,27 +62,6 @@ function initSounds() {
     }
 }
 
-document.addEventListener('click', () => { unlockAudio(); });
-
-// Функция для воспроизведения звука
-function playSound(soundName) {
-    try {
-        const sound = sounds[soundName];
-        if (sound) {
-            // Сбрасываем воспроизведение на начало (если уже играет)
-            sound.currentTime = 0;
-            // Воспроизводим звук
-            sound.play().catch(error => {
-                console.warn('Ошибка воспроизведения звука:', error);
-            });
-        } else {
-            console.warn(`Звук "${soundName}" не найден`);
-        }
-    } catch (error) {
-        console.error('Ошибка при воспроизведении звука:', error);
-    }
-}
-
 // Функция для остановки звука
 function stopSound(soundName) {
     try {
@@ -113,16 +92,23 @@ function isAudioSupported() {
     return typeof Audio !== 'undefined';
 }
 
-// Обновленная функция для начала квиза с добавлением звука
+// Функция для перехода к выбору квеста
+function chooseQuest() {
+    playSound('click');
+    setTimeout(() => {
+        window.location.href = 'quests.html';
+    }, 100);
+}
+
+// Функция для начала квиза
 function startQuiz() {
     playSound('click');
-    // Небольшая задержка для воспроизведения звука перед переходом
     setTimeout(() => {
         window.location.href = 'quiz.html';
     }, 100);
 }
 
-// Обновленная функция для показа уведомлений с добавлением звука
+// Функция для показа уведомлений
 function showMessage(message, type = 'info') {
     // Воспроизводим соответствующий звук
     if (type === 'success') {
@@ -130,7 +116,7 @@ function showMessage(message, type = 'info') {
     } else if (type === 'error') {
         playSound('wrong');
     } else {
-        playSound('click'); // или другой звук для info сообщений
+        playSound('click');
     }
     
     // Создаем элемент для сообщения
@@ -181,12 +167,12 @@ function validateForm(formData) {
 // Функция для сохранения результатов в localStorage
 function saveToLocalStorage(key, data) {
     try {
-        playSound('click'); // Звук при сохранении
+        playSound('click');
         localStorage.setItem(key, JSON.stringify(data));
         return true;
     } catch (error) {
         console.error('Ошибка сохранения:', error);
-        playSound('wrong'); // Звук ошибки
+        playSound('wrong');
         return false;
     }
 }
@@ -202,19 +188,16 @@ function loadFromLocalStorage(key) {
     }
 }
 
-// Функция для озвучивания кликов по кнопкам (можно вызывать в обработчиках)
+// Функция для озвучивания кликов по кнопкам
 function setupButtonSounds() {
-    // Автоматически добавляем звук клика ко всем кнопкам и ссылкам
     document.addEventListener('DOMContentLoaded', () => {
         const interactiveElements = document.querySelectorAll(
             'button, a[href], input[type="submit"], input[type="button"]'
         );
         
         interactiveElements.forEach(element => {
-            // Избегаем дублирования обработчиков
             if (!element.hasAttribute('data-sound-bound')) {
                 element.addEventListener('click', (e) => {
-                    // Проверяем, не является ли элемент отключенным
                     if (!element.disabled) {
                         playSound('click');
                     }
@@ -225,17 +208,38 @@ function setupButtonSounds() {
     });
 }
 
+// Функция для обновления навигации
+function updateNav() {
+    const currentPage = window.location.pathname.split('/').pop();
+    const navLinks = document.querySelectorAll('.main-nav a');
+    
+    navLinks.forEach(link => {
+        const linkPage = link.getAttribute('href');
+        if (linkPage === currentPage) {
+            link.style.background = 'rgba(255, 255, 255, 0.15)';
+            link.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+        } else {
+            link.style.background = '';
+            link.style.borderColor = '';
+        }
+    });
+}
+
 // Автоматическая инициализация звуков при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
     if (isAudioSupported()) {
         initSounds();
         setupButtonSounds();
+        updateNav();
     } else {
         console.warn('Браузер не поддерживает аудио API');
     }
+    
+    // Разблокируем аудио при клике
+    document.addEventListener('click', unlockAudio);
 });
 
-// Экспортируем функции для использования в других модулях (если используется модульная система)
+// Экспортируем функции для использования в других модулях
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         playSound,
@@ -244,11 +248,13 @@ if (typeof module !== 'undefined' && module.exports) {
         initSounds,
         sounds,
         startQuiz,
+        chooseQuest,
         showMessage,
         validateForm,
         saveToLocalStorage,
         loadFromLocalStorage,
         setupButtonSounds,
-        isAudioSupported
+        isAudioSupported,
+        updateNav
     };
 }
