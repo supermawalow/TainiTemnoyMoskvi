@@ -1,5 +1,5 @@
-// quiz.js - 10 вопросов, таймер 1:30
-console.log("✅ quiz.js загружен - 10 вопросов, таймер 1:30");
+// quiz.js - 10 вопросов, таймер 20 секунд
+console.log("✅ quiz.js загружен - 10 вопросов, таймер 20 секунд");
 
 // 10 ВОПРОСОВ
 const quizData = [
@@ -57,10 +57,10 @@ const quizData = [
 
 let currentQuestion = 0;
 let score = 0;
-let timeLeft = 90; // 1 МИНУТА 30 СЕКУНД = 90 секунд
+let timeLeft = 20; // 20 СЕКУНД НА ВОПРОС
 let timerInterval = null;
 
-// ТАЙМЕР на 1:30
+// ТАЙМЕР на 20 секунд
 function startTimer() {
     const timerElement = document.getElementById('timer');
     if (!timerElement) {
@@ -72,10 +72,10 @@ function startTimer() {
     if (timerInterval) clearInterval(timerInterval);
     
     // Сбрасываем время
-    timeLeft = 90;
+    timeLeft = 20;
     updateTimerDisplay();
     
-    // Запускаем новый
+    // Запускаем новый таймер
     timerInterval = setInterval(() => {
         timeLeft--;
         updateTimerDisplay();
@@ -86,7 +86,7 @@ function startTimer() {
         }
     }, 1000);
     
-    console.log("⏱️ Таймер запущен: 1:30");
+    console.log("⏱️ Таймер запущен: 20 секунд");
 }
 
 // Обновление отображения таймера
@@ -94,21 +94,25 @@ function updateTimerDisplay() {
     const timerElement = document.getElementById('timer');
     if (!timerElement) return;
     
-    const minutes = Math.floor(timeLeft / 60);
-    const seconds = timeLeft % 60;
-    const formattedTime = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    // Форматируем время (добавляем 0 перед секундами, если меньше 10)
+    const formattedTime = timeLeft < 10 ? `0${timeLeft}` : `${timeLeft}`;
+    timerElement.textContent = `⏱️ ${formattedTime} сек`;
     
-    timerElement.textContent = `⏱️ ${formattedTime}`;
-    
-    // Меняем цвет
-    if (timeLeft <= 15) {
+    // Меняем цвет в зависимости от оставшегося времени
+    if (timeLeft <= 5) {
+        // Красный с анимацией пульсации при 5 секундах и меньше
         timerElement.style.color = '#ff416c';
+        timerElement.style.fontWeight = 'bold';
         timerElement.style.animation = 'pulse 0.5s infinite';
-    } else if (timeLeft <= 45) {
+    } else if (timeLeft <= 10) {
+        // Желтый при 10 секундах и меньше
         timerElement.style.color = '#f7971e';
+        timerElement.style.fontWeight = 'bold';
         timerElement.style.animation = 'none';
     } else {
+        // Зеленый при более чем 10 секундах
         timerElement.style.color = '#00ffcc';
+        timerElement.style.fontWeight = 'normal';
         timerElement.style.animation = 'none';
     }
 }
@@ -121,18 +125,24 @@ function handleTimeUp() {
     const nextButton = document.getElementById('next-btn');
     const correctIndex = quizData[currentQuestion].correct;
     
-    // Отключаем кнопки
+    // Отключаем все кнопки ответов
     answerButtons.forEach(button => button.disabled = true);
     
     // Подсвечиваем правильный ответ
     answerButtons.forEach((button, index) => {
-        if (index === correctIndex) button.classList.add('correct');
+        if (index === correctIndex) {
+            button.classList.add('correct');
+            // Анимация для правильного ответа
+            button.style.animation = 'pulse 0.5s';
+        }
     });
     
-    // Показываем кнопку "Следующий"
-    if (nextButton) nextButton.classList.remove('hidden');
+    // Показываем кнопку "Следующий вопрос"
+    if (nextButton) {
+        nextButton.classList.remove('hidden');
+    }
     
-    // Сообщение
+    // Показываем сообщение о том, что время вышло
     if (typeof showMessage === 'function') {
         showMessage('⏰ Время вышло! Правильный ответ подсвечен.', 'error');
     }
@@ -146,32 +156,40 @@ function loadQuestion() {
     const answersElement = document.getElementById('answers');
     const progressElement = document.getElementById('progress');
     
-    // Проверяем элементы
+    // Проверяем, что элементы существуют
     if (!questionElement || !answersElement) {
-        console.error("❌ КРИТИЧЕСКАЯ ОШИБКА: Не найдены question или answers!");
+        console.error("❌ ОШИБКА: Не найдены элементы вопроса или ответов!");
         return;
     }
     
-    // Вопрос
+    // Показываем текущий вопрос
     questionElement.textContent = quizData[currentQuestion].question;
     
-    // Очищаем и добавляем ответы
+    // Очищаем предыдущие ответы
     answersElement.innerHTML = '';
+    
+    // Добавляем варианты ответов
     quizData[currentQuestion].answers.forEach((answer, index) => {
         const button = document.createElement('button');
         button.textContent = answer;
         button.className = 'answer-btn';
-        button.onclick = () => selectAnswer(index);
+        
+        // Обработчик клика по ответу
+        button.onclick = () => {
+            console.log(`🎯 Выбран ответ: ${index}`);
+            selectAnswer(index);
+        };
+        
         answersElement.appendChild(button);
     });
     
-    // Прогресс-бар
+    // Обновляем прогресс-бар
     if (progressElement) {
         const progress = ((currentQuestion + 1) / quizData.length) * 100;
         progressElement.style.width = `${progress}%`;
     }
     
-    // Кнопка "Следующий"
+    // Обновляем текст кнопки "Следующий вопрос"
     const nextButton = document.getElementById('next-btn');
     if (nextButton) {
         nextButton.textContent = currentQuestion === quizData.length - 1 
@@ -180,86 +198,112 @@ function loadQuestion() {
         nextButton.classList.add('hidden');
     }
     
-    // Запускаем таймер
+    // Запускаем таймер на 20 секунд
     startTimer();
     
     console.log(`✅ Вопрос ${currentQuestion + 1} загружен успешно`);
 }
 
-// Выбор ответа
+// Функция выбора ответа
 function selectAnswer(selectedIndex) {
     console.log(`🎯 Выбран ответ ${selectedIndex}`);
     
-    // Останавливаем таймер
-    if (timerInterval) clearInterval(timerInterval);
+    // Останавливаем таймер при выборе ответа
+    if (timerInterval) {
+        clearInterval(timerInterval);
+    }
     
     const correctIndex = quizData[currentQuestion].correct;
     const answerButtons = document.querySelectorAll('.answer-btn');
     const nextButton = document.getElementById('next-btn');
     
-    // Отключаем кнопки
-    answerButtons.forEach(button => button.disabled = true);
+    // Отключаем все кнопки ответов
+    answerButtons.forEach(button => {
+        button.disabled = true;
+    });
     
-    // Подсвечиваем ответы
+    // Подсвечиваем правильный и неправильный ответы
     answerButtons.forEach((button, index) => {
         if (index === correctIndex) {
             button.classList.add('correct');
+            // Анимация для правильного ответа
+            button.style.animation = 'pulse 0.5s';
         } else if (index === selectedIndex && index !== correctIndex) {
             button.classList.add('wrong');
         }
     });
     
-    // Счет
+    // Увеличиваем счет, если ответ правильный
     if (selectedIndex === correctIndex) {
         score++;
-        console.log(`✅ Правильно! Счёт: ${score}`);
-        if (typeof playSound === 'function') playSound('correct');
+        console.log(`✅ Правильно! Текущий счет: ${score}`);
+        
+        // Воспроизводим звук правильного ответа
+        if (typeof playSound === 'function') {
+            playSound('correct');
+        }
     } else {
         console.log(`❌ Неправильно!`);
-        if (typeof playSound === 'function') playSound('wrong');
+        
+        // Воспроизводим звук неправильного ответа
+        if (typeof playSound === 'function') {
+            playSound('wrong');
+        }
     }
     
-    // Показываем кнопку "Следующий"
-    if (nextButton) nextButton.classList.remove('hidden');
+    // Показываем кнопку "Следующий вопрос"
+    if (nextButton) {
+        nextButton.classList.remove('hidden');
+    }
 }
 
-// Следующий вопрос
+// Функция перехода к следующему вопросу
 function nextQuestion() {
     console.log("➡️ Переход к следующему вопросу");
     
-    if (timerInterval) clearInterval(timerInterval);
-    if (typeof playSound === 'function') playSound('click');
+    // Останавливаем таймер
+    if (timerInterval) {
+        clearInterval(timerInterval);
+    }
     
+    // Воспроизводим звук клика
+    if (typeof playSound === 'function') {
+        playSound('click');
+    }
+    
+    // Переходим к следующему вопросу
     currentQuestion++;
     
+    // Проверяем, остались ли еще вопросы
     if (currentQuestion < quizData.length) {
         loadQuestion();
     } else {
-        // Конец квиза
-        console.log(`🏁 Квиз завершен! Результат: ${score}/${quizData.length}`);
+        // Квиз завершен
+        console.log(`🏁 Квиз завершен! Итоговый счет: ${score}/${quizData.length}`);
         
-        // Сохраняем результат
+        // Сохраняем результаты в localStorage
         if (typeof saveToLocalStorage === 'function') {
             saveToLocalStorage('quizScore', score);
             saveToLocalStorage('totalQuestions', quizData.length);
         } else {
+            // Резервный вариант, если функция не определена
             localStorage.setItem('quizScore', score);
             localStorage.setItem('totalQuestions', quizData.length);
         }
         
-        // Переходим на результаты
+        // Переходим на страницу результатов
         window.location.href = 'result.html';
     }
 }
 
-// Делаем функцию глобальной
+// Делаем функцию глобальной для использования в HTML
 if (typeof window !== 'undefined') {
     window.nextQuestion = nextQuestion;
 }
 
-// Запускаем при загрузке страницы
+// Загружаем первый вопрос при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("🚀 DOM загружен, запускаем квиз...");
-    console.log("Найдено вопросов:", quizData.length);
+    console.log("🚀 Страница загружена, запускаем квиз...");
+    console.log(`Всего вопросов: ${quizData.length}`);
     loadQuestion();
 });
