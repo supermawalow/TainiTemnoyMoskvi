@@ -33,4 +33,120 @@
             
             <div style="margin-top: 2rem; text-align: center;">
                 <button class="cta-button" onclick="retryQuiz()">Пройти ещё раз</button>
-                <button class="cta-button secondary" onclick="goToQuests
+                <button class="cta-button secondary" onclick="goToQuests()">Выбрать Квест</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2025 Тайны Тёмной Москвы. Создано с 💀</p>
+        <p> BY MEOWLENTII </p>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script>
+        // Показываем результаты когда страница загрузится
+        document.addEventListener('DOMContentLoaded', function() {
+            let score, totalQuestions;
+            
+            // Загружаем результаты
+            if (typeof loadFromLocalStorage === 'function') {
+                score = loadFromLocalStorage('quizScore') || 0;
+                totalQuestions = loadFromLocalStorage('totalQuestions') || 10;
+            } else {
+                score = parseInt(localStorage.getItem('quizScore')) || 0;
+                totalQuestions = parseInt(localStorage.getItem('totalQuestions')) || 10;
+            }
+            
+            const resultContent = document.getElementById('result-content');
+            
+            // Система рейтинга
+            const ratingSystem = [
+                { min: 0, stars: '☆☆☆☆☆', level: 'Новичок', desc: 'Только начинаешь путь в мир московских тайн' },
+                { min: 3, stars: '★☆☆☆☆', level: 'Любитель', desc: 'Уже кое-что знаешь, но есть куда расти' },
+                { min: 6, stars: '★★☆☆☆', level: 'Знаток', desc: 'Хорошо разбираешься в московских легендах' },
+                { min: 8, stars: '★★★☆☆', level: 'Эксперт', desc: 'Почти всё знаешь о тёмной стороне Москвы' },
+                { min: 9, stars: '★★★★☆', level: 'Мастер', desc: 'Настоящий профи в московских страшилках' },
+                { min: 10, stars: '★★★★★', level: 'Легенда Москвы', desc: 'Ты знаешь ВСЁ о мистической Москве!' }
+            ];
+            
+            // Определяем рейтинг
+            let userRating;
+            for (let i = ratingSystem.length - 1; i >= 0; i--) {
+                if (score >= ratingSystem[i].min) {
+                    userRating = ratingSystem[i];
+                    break;
+                }
+            }
+            
+            let resultHTML = `<h3>Ты ответил правильно на ${score} из ${totalQuestions} вопросов!</h3>`;
+            
+            // Добавляем рейтинг
+            resultHTML += `
+                <div style="margin: 1.5rem 0; padding: 1.5rem; background: rgba(255,255,255,0.05); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1);">
+                    <div style="font-size: 2.5rem; color: #ffd200; margin-bottom: 0.5rem; text-align: center;">
+                        ${userRating.stars}
+                    </div>
+                    <h3 style="color: #00ffcc; margin-bottom: 0.5rem; text-align: center;">
+                        ${userRating.level}
+                    </h3>
+                    <p style="color: rgba(255,255,255,0.8); text-align: center; font-size: 0.95rem;">
+                        ${userRating.desc}
+                    </p>
+                </div>
+            `;
+            
+            // Разные сообщения в зависимости от результата
+            if (score === totalQuestions) {
+                resultHTML += `
+                    <div style="color: #b29700; font-size: 1.2rem; margin: 1.5rem 0; padding: 1rem; background: rgba(178, 151, 0, 0.1); border-radius: 10px; text-align: center;">
+                        🏆 Потрясающе! Ты настоящий эксперт по московским страшилкам!
+                    </div>
+                    <p style="text-align: center;">Ты готов к самому жуткому приключению в реальной жизни!</p>
+                `;
+            } else if (score >= totalQuestions / 2) {
+                resultHTML += `
+                    <div style="color: #b29700; font-size: 1.2rem; margin: 1.5rem 0; padding: 1rem; background: rgba(178, 151, 0, 0.1); border-radius: 10px; text-align: center;">
+                        👍 Неплохо! Ты многое знаешь, но Москва приготовила для тебя ещё сюрпризы!
+                    </div>
+                `;
+            } else {
+                resultHTML += `
+                    <div style="color: #b29700; font-size: 1.2rem; margin: 1.5rem 0; padding: 1rem; background: rgba(178, 151, 0, 0.1); border-radius: 10px; text-align: center;">
+                        💀 Страшно? Не переживай! У тебя есть шанс узнать больше на реальном квесте!
+                    </div>
+                `;
+            }
+            
+            resultContent.innerHTML = resultHTML;
+            
+            // Пасхалка для отличного результата
+            if (score >= 9) {
+                setTimeout(() => {
+                    if (typeof showMessage === 'function') {
+                        showMessage('🎭 Секрет: Нажми Ctrl+Shift+M для пасхалки!', 'info');
+                    }
+                }, 2000);
+            }
+        });
+        
+        function retryQuiz() {
+            if (typeof playSound === 'function') {
+                playSound('click');
+            }
+            setTimeout(() => {
+                window.location.href = 'quiz.html';
+            }, 100);
+        }
+        
+        function goToQuests() {
+            if (typeof playSound === 'function') {
+                playSound('click');
+            }
+            setTimeout(() => {
+                window.location.href = 'quests.html';
+            }, 100);
+        }
+    </script>
+</body>
+</html>
