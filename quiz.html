@@ -9,12 +9,17 @@
 <body>
     <header>
         <div class="logo">
-            <h1>Тайны Тёмной Москвы</h1>
+            <h1 onclick="handleLogoClick()">Тайны Тёмной Москвы</h1>
         </div>
+        
+        <!-- Кнопка мобильного меню -->
+        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+        
         <nav class="main-nav">
             <a href="index.html">Главная</a>
             <a href="quiz.html">Начать Квиз</a>
-            <a href="register.html">Записаться на Квест</a>
+            <a href="quests.html">Выбрать Квест</a>
+            <a href="register.html">Записаться</a>
         </nav>
     </header>
 
@@ -23,18 +28,25 @@
             <h2>Проверь свои знания московских страшилок!</h2>
             <p style="margin-bottom: 2rem; color: #ccc;">Ответь на все вопросы и узнай, готов ли ты к реальному приключению</p>
             
+            <!-- Прогресс-бар -->
             <div class="progress-bar">
                 <div class="progress" id="progress"></div>
             </div>
             
+            <!-- Таймер -->
+            <div class="timer" id="timer">⏱️ 30 сек</div>
+            
+            <!-- Вопрос -->
             <div class="question" id="question">
                 <!-- Вопрос будет загружен через JavaScript -->
             </div>
             
+            <!-- Ответы -->
             <div class="answers" id="answers">
                 <!-- Варианты ответов будут добавлены через JavaScript -->
             </div>
             
+            <!-- Кнопка следующего вопроса -->
             <button class="next-btn hidden" id="next-btn" onclick="nextQuestion()">
                 Следующий вопрос
             </button>
@@ -49,5 +61,4 @@
     <script src="js/script.js"></script>
     <script src="js/quiz.js"></script>
 </body>
-
 </html>
