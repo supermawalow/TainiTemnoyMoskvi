@@ -5,35 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Тайны Тёмной Москвы</title>
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        .hero-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 2rem;
-        }
-
-        .cta-button.secondary {
-            background: linear-gradient(45deg, rgba(0, 255, 204, 0.6), rgba(255, 0, 128, 0.6));
-            border: 2px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .cta-button.secondary:hover {
-            background: linear-gradient(45deg, rgba(0, 255, 204, 0.8), rgba(255, 0, 128, 0.8));
-            transform: translateY(-3px);
-            box-shadow: 
-                0 15px 35px rgba(0, 255, 204, 0.4),
-                0 5px 15px rgba(255, 0, 128, 0.3);
-        }
-    </style>
+    <!-- Фоновая музыка -->
+    <audio id="bg-music" loop>
+        <source src="sounds/ambient.mp3" type="audio/mpeg">
+    </audio>
 </head>
 <body>
     <!-- Шапка сайта -->
     <header>
         <div class="logo">
-            <h1>Тайны Тёмной Москвы</h1>
+            <h1 onclick="handleLogoClick()">Тайны Тёмной Москвы</h1>
         </div>
+        
+        <!-- Кнопка мобильного меню -->
+        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+        
         <nav class="main-nav">
             <a href="index.html">Главная</a>
             <a href="quiz.html">Начать Квиз</a>
