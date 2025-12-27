@@ -627,3 +627,26 @@ footer {
         max-width: 300px;
     }
 }
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Улучшенный стиль для таймера */
+.timer {
+    text-align: center;
+    font-size: 1.4rem;
+    margin: 1.5rem 0;
+    color: #00ffcc;
+    font-weight: bold;
+    padding: 0.8rem;
+    background: rgba(0, 255, 204, 0.1);
+    border-radius: 15px;
+    border: 2px solid rgba(0, 255, 204, 0.3);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 255, 204, 0.2);
+}
