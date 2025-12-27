@@ -149,10 +149,6 @@ function loadQuestion() {
     // Проверяем элементы
     if (!questionElement || !answersElement) {
         console.error("❌ КРИТИЧЕСКАЯ ОШИБКА: Не найдены question или answers!");
-        console.log("Найденные элементы:", {
-            question: questionElement,
-            answers: answersElement
-        });
         return;
     }
     
