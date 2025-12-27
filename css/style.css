@@ -391,7 +391,7 @@ footer {
 /* Таймер */
 .timer {
     text-align: center;
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     margin: 1rem 0 2rem 0;
     color: #00ffcc;
     font-weight: bold;
@@ -400,6 +400,8 @@ footer {
     border-radius: 10px;
     border: 1px solid rgba(0, 255, 204, 0.3);
     transition: all 0.3s ease;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
 }
 
 .question {
@@ -507,9 +509,9 @@ footer {
 
 /* Анимации */
 @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
 }
 
 .question {
@@ -536,7 +538,7 @@ footer {
     to { opacity: 1; transform: translateX(0); }
 }
 
-/* Контроль музыки */
+/* КОНТРОЛЬ МУЗЫКИ - НОВЫЕ СТИЛИ */
 .music-control {
     position: fixed;
     bottom: 20px;
@@ -549,14 +551,67 @@ footer {
     color: white;
     font-size: 1.2rem;
     cursor: pointer;
-    z-index: 999;
+    z-index: 9999;
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .music-control:hover {
     background: rgba(255, 255, 255, 0.2);
     transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.volume-slider {
+    position: fixed;
+    bottom: 80px;
+    left: 20px;
+    width: 50px;
+    height: 120px;
+    cursor: pointer;
+    z-index: 9998;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    -webkit-appearance: slider-vertical;
+    appearance: slider-vertical;
+    writing-mode: bt-lr;
+    background: transparent;
+    pointer-events: none;
+}
+
+.volume-slider::-webkit-slider-runnable-track {
+    width: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #00ffcc;
+    cursor: pointer;
+    border: 2px solid white;
+}
+
+.volume-slider::-moz-range-track {
+    width: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+}
+
+.volume-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #00ffcc;
+    cursor: pointer;
+    border: 2px solid white;
 }
 
 /* Адаптивность для мобильных устройств */
@@ -626,27 +681,20 @@ footer {
         width: 100%;
         max-width: 300px;
     }
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.05); opacity: 0.8; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-/* Улучшенный стиль для таймера */
-.timer {
-    text-align: center;
-    font-size: 1.4rem;
-    margin: 1.5rem 0;
-    color: #00ffcc;
-    font-weight: bold;
-    padding: 0.8rem;
-    background: rgba(0, 255, 204, 0.1);
-    border-radius: 15px;
-    border: 2px solid rgba(0, 255, 204, 0.3);
-    font-family: 'Courier New', monospace;
-    letter-spacing: 1px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 255, 204, 0.2);
+    
+    /* Адаптив для кнопки музыки */
+    .music-control {
+        bottom: 15px;
+        left: 15px;
+        width: 45px;
+        height: 45px;
+        font-size: 1.1rem;
+    }
+    
+    .volume-slider {
+        bottom: 70px;
+        left: 15px;
+        width: 40px;
+        height: 100px;
+    }
 }
