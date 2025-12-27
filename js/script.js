@@ -14,7 +14,6 @@ let isAudioUnlocked = false;
 function unlockAudio() {
     if (isAudioUnlocked || !audioContext) return;
     
-    // Возобновляем контекст (это даст разрешение на воспроизведение)
     if (audioContext.state === 'suspended') {
         audioContext.resume().then(() => {
             console.log('Аудио разблокировано!');
@@ -23,12 +22,11 @@ function unlockAudio() {
     }
 }
 
-// Модифицируем функцию воспроизведения звука
+// Функция воспроизведения звука
 function playSound(soundName) {
     try {
         const sound = sounds[soundName];
         if (sound) {
-            // Разблокируем аудио при первой попытке воспроизведения
             if (!isAudioUnlocked) {
                 unlockAudio();
             }
@@ -45,10 +43,9 @@ function playSound(soundName) {
     }
 }
 
-// Обновляем инициализацию
+// Инициализация звуков
 function initSounds() {
     try {
-        // Создаем AudioContext для лучшего контроля
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         audioContext = new AudioContextClass();
         
@@ -60,36 +57,6 @@ function initSounds() {
     } catch (error) {
         console.error('Ошибка инициализации звуков:', error);
     }
-}
-
-// Функция для остановки звука
-function stopSound(soundName) {
-    try {
-        const sound = sounds[soundName];
-        if (sound) {
-            sound.pause();
-            sound.currentTime = 0;
-        }
-    } catch (error) {
-        console.error('Ошибка при остановке звука:', error);
-    }
-}
-
-// Функция для настройки громкости конкретного звука
-function setSoundVolume(soundName, volume) {
-    try {
-        const sound = sounds[soundName];
-        if (sound) {
-            sound.volume = Math.max(0, Math.min(1, volume));
-        }
-    } catch (error) {
-        console.error('Ошибка при настройке громкости:', error);
-    }
-}
-
-// Функция для проверки поддержки аудио браузером
-function isAudioSupported() {
-    return typeof Audio !== 'undefined';
 }
 
 // Функция для перехода к выбору квеста
@@ -110,7 +77,6 @@ function startQuiz() {
 
 // Функция для показа уведомлений
 function showMessage(message, type = 'info') {
-    // Воспроизводим соответствующий звук
     if (type === 'success') {
         playSound('correct');
     } else if (type === 'error') {
@@ -119,7 +85,6 @@ function showMessage(message, type = 'info') {
         playSound('click');
     }
     
-    // Создаем элемент для сообщения
     const messageDiv = document.createElement('div');
     messageDiv.textContent = message;
     messageDiv.style.cssText = `
@@ -131,26 +96,32 @@ function showMessage(message, type = 'info') {
         z-index: 1000;
         font-weight: bold;
         max-width: 300px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     `;
     
-    // Разные цвета для разных типов сообщений
     if (type === 'success') {
-        messageDiv.style.backgroundColor = '#2d5a2d';
+        messageDiv.style.backgroundColor = 'rgba(45, 90, 45, 0.9)';
         messageDiv.style.color = 'white';
+        messageDiv.style.border = '1px solid rgba(0, 255, 0, 0.3)';
     } else if (type === 'error') {
-        messageDiv.style.backgroundColor = '#5a2d2d';
+        messageDiv.style.backgroundColor = 'rgba(90, 45, 45, 0.9)';
         messageDiv.style.color = 'white';
+        messageDiv.style.border = '1px solid rgba(255, 0, 0, 0.3)';
     } else {
-        messageDiv.style.backgroundColor = '#b29700';
+        messageDiv.style.backgroundColor = 'rgba(178, 151, 0, 0.9)';
         messageDiv.style.color = '#1a1a1a';
+        messageDiv.style.border = '1px solid rgba(255, 215, 0, 0.3)';
     }
     
-    // Добавляем сообщение на страницу
     document.body.appendChild(messageDiv);
     
-    // Удаляем сообщение через 3 секунды
     setTimeout(() => {
-        messageDiv.remove();
+        messageDiv.style.opacity = '0';
+        messageDiv.style.transition = 'opacity 0.5s';
+        setTimeout(() => {
+            messageDiv.remove();
+        }, 500);
     }, 3000);
 }
 
@@ -164,7 +135,7 @@ function validateForm(formData) {
     return true;
 }
 
-// Функция для сохранения результатов в localStorage
+// Функция для сохранения в localStorage
 function saveToLocalStorage(key, data) {
     try {
         playSound('click');
@@ -177,7 +148,7 @@ function saveToLocalStorage(key, data) {
     }
 }
 
-// Функция для загрузки данных из localStorage
+// Функция для загрузки из localStorage
 function loadFromLocalStorage(key) {
     try {
         const data = localStorage.getItem(key);
@@ -188,7 +159,7 @@ function loadFromLocalStorage(key) {
     }
 }
 
-// Функция для озвучивания кликов по кнопкам
+// Функция для озвучивания кликов
 function setupButtonSounds() {
     document.addEventListener('DOMContentLoaded', () => {
         const interactiveElements = document.querySelectorAll(
@@ -198,7 +169,7 @@ function setupButtonSounds() {
         interactiveElements.forEach(element => {
             if (!element.hasAttribute('data-sound-bound')) {
                 element.addEventListener('click', (e) => {
-                    if (!element.disabled) {
+                    if (!element.disabled && !element.classList.contains('menu-toggle')) {
                         playSound('click');
                     }
                 });
@@ -206,6 +177,15 @@ function setupButtonSounds() {
             }
         });
     });
+}
+
+// Функция мобильного меню
+function toggleMenu() {
+    const nav = document.querySelector('.main-nav');
+    if (nav) {
+        nav.classList.toggle('active');
+        playSound('click');
+    }
 }
 
 // Функция для обновления навигации
@@ -225,36 +205,173 @@ function updateNav() {
     });
 }
 
-// Автоматическая инициализация звуков при загрузке страницы
+// Пасхалки
+let logoClickCount = 0;
+let lastLogoClickTime = 0;
+
+function handleLogoClick() {
+    const now = Date.now();
+    
+    if (now - lastLogoClickTime < 1000) {
+        logoClickCount++;
+    } else {
+        logoClickCount = 1;
+    }
+    
+    lastLogoClickTime = now;
+    
+    if (logoClickCount === 5) {
+        showMessage('👻 Секрет активирован! Введи код "1991" где-нибудь на сайте...', 'success');
+        playSound('correct');
+        logoClickCount = 0;
+        
+        // Сохраняем в localStorage, что пасхалка найдена
+        saveToLocalStorage('easterEggFound', true);
+    }
+}
+
+// Фоновая музыка
+let isMusicPlaying = false;
+let bgMusic = null;
+
+function initBackgroundMusic() {
+    bgMusic = document.getElementById('bg-music');
+    if (bgMusic) {
+        bgMusic.volume = 0.3;
+        
+        // Создаем кнопку управления музыкой
+        const musicButton = document.createElement('button');
+        musicButton.id = 'music-toggle';
+        musicButton.className = 'music-control';
+        musicButton.textContent = '🎵';
+        musicButton.title = 'Включить/выключить музыку';
+        musicButton.onclick = toggleBackgroundMusic;
+        
+        document.body.appendChild(musicButton);
+        
+        // Пробуем включить музыку автоматически
+        setTimeout(() => {
+            if (!isMusicPlaying) {
+                bgMusic.play().then(() => {
+                    isMusicPlaying = true;
+                    musicButton.textContent = '🎵';
+                }).catch(e => {
+                    console.log('Автовоспроизведение заблокировано');
+                });
+            }
+        }, 1000);
+    }
+}
+
+function toggleBackgroundMusic() {
+    if (!bgMusic) {
+        bgMusic = document.getElementById('bg-music');
+    }
+    
+    if (!bgMusic) return;
+    
+    playSound('click');
+    
+    if (isMusicPlaying) {
+        bgMusic.pause();
+        document.getElementById('music-toggle').textContent = '🔇';
+        showMessage('🔇 Музыка выключена', 'info');
+    } else {
+        bgMusic.volume = 0.3;
+        bgMusic.play().catch(e => {
+            showMessage('🎵 Нажми ещё раз для включения музыки', 'info');
+        });
+        document.getElementById('music-toggle').textContent = '🎵';
+        showMessage('🎵 Фоновая музыка включена', 'success');
+    }
+    
+    isMusicPlaying = !isMusicPlaying;
+}
+
+// Пасхалка с клавиатурой
+let secretCode = '';
+const targetCode = '1991';
+
+document.addEventListener('keydown', function(e) {
+    // Секретная комбинация: Ctrl+Shift+M
+    if (e.ctrlKey && e.shiftKey && e.key === 'M') {
+        showMessage('🎭 Поздравляю! Ты нашёл пасхалку! По легенде, в 3:00 ночи на станции "Библиотека им. Ленина" можно увидеть тень Чёрного Монаха...', 'info');
+        playSound('correct');
+        
+        // Разблокируем секретный достижение
+        const achievements = loadFromLocalStorage('achievements') || [];
+        if (!achievements.includes('black_monk_secret')) {
+            achievements.push('black_monk_secret');
+            saveToLocalStorage('achievements', achievements);
+        }
+    }
+    
+    // Собираем код "1991"
+    if (e.key >= '0' && e.key <= '9') {
+        secretCode += e.key;
+        
+        if (secretCode.length > 4) {
+            secretCode = secretCode.slice(-4);
+        }
+        
+        if (secretCode === targetCode) {
+            showMessage('🔓 Секретный код принят! 1991... год больших перемен. Говорят, в этом году в Москве открылись порталы в другие миры...', 'success');
+            playSound('correct');
+            secretCode = '';
+            
+            // Разблокируем секретное достижение
+            const achievements = loadFromLocalStorage('achievements') || [];
+            if (!achievements.includes('1991_secret')) {
+                achievements.push('1991_secret');
+                saveToLocalStorage('achievements', achievements);
+            }
+        }
+    }
+});
+
+// Закрывать мобильное меню при клике вне его
+document.addEventListener('click', function(e) {
+    const nav = document.querySelector('.main-nav');
+    const menuToggle = document.querySelector('.menu-toggle');
+    
+    if (nav && nav.classList.contains('active') && 
+        !nav.contains(e.target) && 
+        menuToggle && !menuToggle.contains(e.target)) {
+        nav.classList.remove('active');
+    }
+});
+
+// Автоматическая инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
-    if (isAudioSupported()) {
+    if (typeof Audio !== 'undefined') {
         initSounds();
         setupButtonSounds();
-        updateNav();
     } else {
         console.warn('Браузер не поддерживает аудио API');
     }
     
-    // Разблокируем аудио при клике
+    updateNav();
+    
+    // Инициализация фоновой музыки только на главной
+    if (document.querySelector('.hero')) {
+        initBackgroundMusic();
+    }
+    
+    // Разблокировка аудио при любом клике
     document.addEventListener('click', unlockAudio);
 });
 
-// Экспортируем функции для использования в других модулях
+// Экспортируем функции
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         playSound,
-        stopSound,
-        setSoundVolume,
-        initSounds,
-        sounds,
         startQuiz,
         chooseQuest,
         showMessage,
         validateForm,
         saveToLocalStorage,
         loadFromLocalStorage,
-        setupButtonSounds,
-        isAudioSupported,
+        toggleMenu,
         updateNav
     };
 }
