@@ -1,78 +1,4 @@
-// ================================
-// СИСТЕМА ЗВУКОВ ДЛЯ КВИЗА
-// ================================
-
-// Инициализация звуков для квиза
-const quizSounds = {
-    correct: new Audio('sounds/correct.mp3'),
-    click: new Audio('sounds/click.mp3'),
-    wrong: new Audio('sounds/wrong.mp3'),
-    next: new Audio('sounds/click.mp3') // Можно заменить на другой звук
-};
-
-// Флаг для отслеживания инициализации звуков
-let soundsInitialized = false;
-
-// Инициализация звуков для квиза
-function initQuizSounds() {
-    if (soundsInitialized) return;
-    
-    try {
-        // Настройка громкости
-        quizSounds.correct.volume = 0.7;
-        quizSounds.click.volume = 1;
-        quizSounds.wrong.volume = 0.3;
-        quizSounds.next.volume = 0.5;
-        
-        // Предзагрузка звуков
-        Object.values(quizSounds).forEach(sound => {
-            sound.load().catch(e => console.log('Предзагрузка звука:', e));
-        });
-        
-        soundsInitialized = true;
-        console.log('Звуки квиза инициализированы');
-    } catch (error) {
-        console.error('Ошибка инициализации звуков квиза:', error);
-    }
-}
-
-// Воспроизведение звуков в квизе
-function playQuizSound(soundName) {
-    try {
-        const sound = quizSounds[soundName];
-        if (sound) {
-            sound.currentTime = 0;
-            sound.play().catch(e => {
-                // Если ошибка автовоспроизведения, инициализируем по первому клику
-                if (e.name === 'NotAllowedError') {
-                    enableQuizSoundsOnInteraction();
-                }
-            });
-        }
-    } catch (error) {
-        console.warn('Ошибка воспроизведения звука:', error);
-    }
-}
-
-// Активация звуков по первому взаимодействию
-function enableQuizSoundsOnInteraction() {
-    const enableOnce = () => {
-        initQuizSounds();
-        // Удаляем обработчики после активации
-        document.removeEventListener('click', enableOnce);
-        document.removeEventListener('keydown', enableOnce);
-        document.removeEventListener('touchstart', enableOnce);
-    };
-    
-    document.addEventListener('click', enableOnce);
-    document.addEventListener('keydown', enableOnce);
-    document.addEventListener('touchstart', enableOnce);
-}
-
-// ================================
-// ДАННЫЕ ДЛЯ КВИЗА
-// ================================
-
+// Данные для квиза - вопросы и ответы
 const quizData = [
     {
         question: "В каком московском метро по легенде обитает призрак 'Чёрного монаха'?",
@@ -178,22 +104,52 @@ const quizData = [
 
 let currentQuestion = 0;
 let score = 0;
-let answerSelected = false;
+let timeLeft = 30;
+let timerInterval;
 
-// ================================
-// ОСНОВНЫЕ ФУНКЦИИ КВИЗА
-// ================================
+// Таймер
+function startTimer() {
+    const timerElement = document.getElementById('timer');
+    if (!timerElement) return;
+    
+    timeLeft = 30;
+    clearInterval(timerInterval);
+    
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        timerElement.textContent = `⏱️ ${timeLeft} сек`;
+        
+        // Меняем цвет при низком времени
+        if (timeLeft <= 10) {
+            timerElement.style.color = '#ff416c';
+            timerElement.style.animation = 'pulse 1s infinite';
+        } else if (timeLeft <= 20) {
+            timerElement.style.color = '#f7971e';
+            timerElement.style.animation = 'none';
+        } else {
+            timerElement.style.color = '#00ffcc';
+            timerElement.style.animation = 'none';
+        }
+        
+        // Время вышло
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            // Автоматически выбираем "не знаю"
+            if (currentQuestion < quizData.length - 1) {
+                setTimeout(() => {
+                    nextQuestion();
+                }, 500);
+            }
+        }
+    }, 1000);
+}
 
-// Загрузка вопроса
+// Функция для загрузки вопроса
 function loadQuestion() {
     const questionElement = document.getElementById('question');
     const answersElement = document.getElementById('answers');
     const progressElement = document.getElementById('progress');
     const nextButton = document.getElementById('next-btn');
-    
-    // Сбрасываем состояние
-    answerSelected = false;
-    nextButton.classList.add('hidden');
     
     // Показываем текущий вопрос
     questionElement.textContent = quizData[currentQuestion].question;
@@ -206,11 +162,7 @@ function loadQuestion() {
         const button = document.createElement('button');
         button.textContent = answer;
         button.className = 'answer-btn';
-        button.onclick = () => {
-            if (!answerSelected) {
-                selectAnswer(index);
-            }
-        };
+        button.onclick = () => selectAnswer(index);
         answersElement.appendChild(button);
     });
     
@@ -218,24 +170,27 @@ function loadQuestion() {
     const progress = ((currentQuestion + 1) / quizData.length) * 100;
     progressElement.style.width = `${progress}%`;
     
-    // Обновляем текст на кнопке
+    // Обновляем текст кнопки
     if (currentQuestion === quizData.length - 1) {
-        nextButton.textContent = '✨ Узнать результат';
+        nextButton.textContent = 'Узнать результат';
     } else {
-        nextButton.textContent = '➡️ Следующий вопрос';
+        nextButton.textContent = 'Следующий вопрос';
     }
+    
+    // Скрываем кнопку следующего вопроса
+    nextButton.classList.add('hidden');
+    
+    // Запускаем таймер
+    startTimer();
 }
 
-// Выбор ответа
+// Функция выбора ответа
 function selectAnswer(selectedIndex) {
-    answerSelected = true;
+    clearInterval(timerInterval);
     
     const correctIndex = quizData[currentQuestion].correct;
     const answerButtons = document.querySelectorAll('.answer-btn');
     const nextButton = document.getElementById('next-btn');
-    
-    // Воспроизводим звук клика при выборе ответа
-    playQuizSound('click');
     
     // Отключаем все кнопки
     answerButtons.forEach(button => {
@@ -251,92 +206,51 @@ function selectAnswer(selectedIndex) {
         }
     });
     
-    // Обработка правильного/неправильного ответа
+    // Увеличиваем счёт если ответ правильный
     if (selectedIndex === correctIndex) {
         score++;
-        // Звук правильного ответа с задержкой
-        setTimeout(() => playQuizSound('correct'), 300);
-        
-        // Анимация для правильного ответа (опционально)
-        answerButtons[selectedIndex].style.animation = 'pulseCorrect 0.5s';
+        if (typeof playSound === 'function') {
+            playSound('correct');
+        }
     } else {
-        // Звук неправильного ответа с задержкой
-        setTimeout(() => playQuizSound('wrong'), 300);
-        
-        // Анимация для неправильного ответа (опционально)
-        answerButtons[selectedIndex].style.animation = 'shakeWrong 0.5s';
+        if (typeof playSound === 'function') {
+            playSound('wrong');
+        }
     }
     
     // Показываем кнопку "Следующий вопрос"
-    setTimeout(() => {
-        nextButton.classList.remove('hidden');
-    }, 500);
+    nextButton.classList.remove('hidden');
 }
 
-// Переход к следующему вопросу
+// Функция перехода к следующему вопросу
 function nextQuestion() {
-    // Звук при нажатии кнопки "Далее"
-    playQuizSound('next');
+    clearInterval(timerInterval);
+    
+    if (typeof playSound === 'function') {
+        playSound('click');
+    }
     
     currentQuestion++;
     
     if (currentQuestion < quizData.length) {
-        setTimeout(() => loadQuestion(), 200); // Небольшая задержка для плавности
+        loadQuestion();
     } else {
-        // Сохраняем результаты и переходим на страницу результатов
+        // Квиз завершен, переходим на страницу результатов
         if (typeof saveToLocalStorage === 'function') {
             saveToLocalStorage('quizScore', score);
             saveToLocalStorage('totalQuestions', quizData.length);
         } else {
-            // Резервное сохранение
             localStorage.setItem('quizScore', score);
             localStorage.setItem('totalQuestions', quizData.length);
         }
-        
-        // Задержка перед переходом для воспроизведения звука
-        setTimeout(() => {
-            window.location.href = 'result.html';
-        }, 300);
+        window.location.href = 'result.html';
     }
 }
 
-// ================================
-// ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ
-// ================================
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Инициализируем звуки для квиза
-    initQuizSounds();
-    enableQuizSoundsOnInteraction();
-    
-    // Загружаем первый вопрос
-    loadQuestion();
-    
-    // Добавляем звук клика к кнопке "Следующий вопрос"
-    const nextButton = document.getElementById('next-btn');
-    if (nextButton) {
-        nextButton.addEventListener('click', () => playQuizSound('click'));
-    }
-    
-    // Добавляем CSS анимации для ответов (опционально)
-    if (!document.querySelector('#quiz-animations')) {
-        const style = document.createElement('style');
-        style.id = 'quiz-animations';
-        style.textContent = `
-            @keyframes pulseCorrect {
-                0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
-                70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
-                100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
-            }
-            @keyframes shakeWrong {
-                0%, 100% { transform: translateX(0); }
-                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-                20%, 40%, 60%, 80% { transform: translateX(5px); }
-            }
-            .correct {
-                animation: pulseCorrect 1.5s infinite !important;
-            }
+// Загружаем первый вопрос когда страница загрузится
+document.addEventListener('DOMContentLoaded', loadQuestion);
         `;
         document.head.appendChild(style);
     }
+
 });
