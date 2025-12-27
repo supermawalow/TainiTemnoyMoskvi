@@ -59,6 +59,187 @@ function initSounds() {
     }
 }
 
+// ГЛОБАЛЬНАЯ ФОНОВАЯ МУЗЫКА
+let backgroundMusic = null;
+let isMusicPlaying = false;
+let musicVolume = 0.3; // Громкость 30%
+
+// Инициализация музыки
+function initBackgroundMusic() {
+    if (backgroundMusic) return;
+    
+    try {
+        backgroundMusic = new Audio('sounds/ambient.mp3');
+        backgroundMusic.loop = true;
+        backgroundMusic.volume = musicVolume;
+        backgroundMusic.preload = 'auto';
+        
+        console.log('🎵 Фоновая музыка инициализирована');
+        
+        // Пытаемся включить музыку автоматически
+        setTimeout(() => {
+            if (!isMusicPlaying) {
+                backgroundMusic.play().then(() => {
+                    isMusicPlaying = true;
+                    updateMusicButton();
+                    console.log('🎵 Музыка автоматически включена');
+                }).catch(e => {
+                    console.log('🎵 Автовоспроизведение заблокировано, ждём клика пользователя');
+                });
+            }
+        }, 1000);
+        
+    } catch (error) {
+        console.error('Ошибка загрузки музыки:', error);
+    }
+}
+
+// Переключение музыки
+function toggleBackgroundMusic() {
+    if (!backgroundMusic) {
+        initBackgroundMusic();
+        return;
+    }
+    
+    playSound('click'); // Звук клика
+    
+    if (isMusicPlaying) {
+        backgroundMusic.pause();
+        isMusicPlaying = false;
+        showMessage('🔇 Музыка выключена', 'info');
+    } else {
+        backgroundMusic.play().catch(e => {
+            showMessage('🎵 Нажми ещё раз для включения', 'info');
+            return;
+        });
+        isMusicPlaying = true;
+        showMessage('🎵 Фоновая музыка включена', 'success');
+    }
+    
+    updateMusicButton();
+    saveMusicState();
+}
+
+// Обновление кнопки музыки
+function updateMusicButton() {
+    const musicButton = document.getElementById('music-toggle');
+    if (musicButton) {
+        musicButton.textContent = isMusicPlaying ? '🔊' : '🔇';
+        musicButton.title = isMusicPlaying ? 'Выключить музыку' : 'Включить музыку';
+    }
+}
+
+// Сохранение состояния музыки
+function saveMusicState() {
+    localStorage.setItem('musicState', JSON.stringify({
+        isPlaying: isMusicPlaying,
+        volume: musicVolume
+    }));
+}
+
+// Загрузка состояния музыки
+function loadMusicState() {
+    try {
+        const saved = JSON.parse(localStorage.getItem('musicState'));
+        if (saved) {
+            isMusicPlaying = saved.isPlaying;
+            musicVolume = saved.volume || 0.3;
+            
+            // Обновляем громкость, если музыка уже загружена
+            if (backgroundMusic) {
+                backgroundMusic.volume = musicVolume;
+            }
+        }
+    } catch (e) {
+        console.log('Не удалось загрузить состояние музыки');
+    }
+}
+
+// Изменение громкости
+function changeMusicVolume(newVolume) {
+    if (!backgroundMusic) return;
+    
+    musicVolume = Math.max(0, Math.min(1, newVolume));
+    backgroundMusic.volume = musicVolume;
+    
+    // Обновляем ползунок громкости
+    const volumeSlider = document.getElementById('volume-slider');
+    if (volumeSlider) {
+        volumeSlider.value = musicVolume * 100;
+    }
+    
+    saveMusicState();
+}
+
+// Создание кнопки управления музыкой
+function createMusicControl() {
+    // Проверяем, не создана ли уже кнопка
+    if (document.getElementById('music-toggle')) return;
+    
+    const musicButton = document.createElement('button');
+    musicButton.id = 'music-toggle';
+    musicButton.className = 'music-control';
+    musicButton.onclick = toggleBackgroundMusic;
+    musicButton.title = 'Включить/выключить музыку';
+    
+    document.body.appendChild(musicButton);
+    
+    // Создаем ползунок громкости
+    const volumeSlider = document.createElement('input');
+    volumeSlider.type = 'range';
+    volumeSlider.min = '0';
+    volumeSlider.max = '100';
+    volumeSlider.value = musicVolume * 100;
+    volumeSlider.id = 'volume-slider';
+    volumeSlider.className = 'volume-slider';
+    volumeSlider.title = 'Громкость';
+    
+    volumeSlider.addEventListener('input', function() {
+        changeMusicVolume(this.value / 100);
+    });
+    
+    document.body.appendChild(volumeSlider);
+    
+    // Показываем ползунок при наведении на кнопку
+    musicButton.addEventListener('mouseenter', function() {
+        volumeSlider.style.opacity = '1';
+        volumeSlider.style.pointerEvents = 'auto';
+    });
+    
+    musicButton.addEventListener('mouseleave', function() {
+        setTimeout(() => {
+            if (!volumeSlider.matches(':hover')) {
+                volumeSlider.style.opacity = '0';
+                volumeSlider.style.pointerEvents = 'none';
+            }
+        }, 300);
+    });
+    
+    volumeSlider.addEventListener('mouseleave', function() {
+        setTimeout(() => {
+            if (!musicButton.matches(':hover')) {
+                volumeSlider.style.opacity = '0';
+                volumeSlider.style.pointerEvents = 'none';
+            }
+        }, 300);
+    });
+    
+    // Скрываем ползунок по умолчанию
+    volumeSlider.style.opacity = '0';
+    volumeSlider.style.pointerEvents = 'none';
+    
+    // Загружаем состояние и обновляем кнопку
+    loadMusicState();
+    updateMusicButton();
+    
+    // Если музыка должна играть, запускаем её
+    if (isMusicPlaying && backgroundMusic && backgroundMusic.paused) {
+        backgroundMusic.play().catch(e => {
+            console.log('Ожидаем взаимодействия пользователя для воспроизведения музыки');
+        });
+    }
+}
+
 // Функция для перехода к выбору квеста
 function chooseQuest() {
     playSound('click');
@@ -230,64 +411,6 @@ function handleLogoClick() {
     }
 }
 
-// Фоновая музыка
-let isMusicPlaying = false;
-let bgMusic = null;
-
-function initBackgroundMusic() {
-    bgMusic = document.getElementById('bg-music');
-    if (bgMusic) {
-        bgMusic.volume = 0.3;
-        
-        // Создаем кнопку управления музыкой
-        const musicButton = document.createElement('button');
-        musicButton.id = 'music-toggle';
-        musicButton.className = 'music-control';
-        musicButton.textContent = '🎵';
-        musicButton.title = 'Включить/выключить музыку';
-        musicButton.onclick = toggleBackgroundMusic;
-        
-        document.body.appendChild(musicButton);
-        
-        // Пробуем включить музыку автоматически
-        setTimeout(() => {
-            if (!isMusicPlaying) {
-                bgMusic.play().then(() => {
-                    isMusicPlaying = true;
-                    musicButton.textContent = '🎵';
-                }).catch(e => {
-                    console.log('Автовоспроизведение заблокировано');
-                });
-            }
-        }, 1000);
-    }
-}
-
-function toggleBackgroundMusic() {
-    if (!bgMusic) {
-        bgMusic = document.getElementById('bg-music');
-    }
-    
-    if (!bgMusic) return;
-    
-    playSound('click');
-    
-    if (isMusicPlaying) {
-        bgMusic.pause();
-        document.getElementById('music-toggle').textContent = '🔇';
-        showMessage('🔇 Музыка выключена', 'info');
-    } else {
-        bgMusic.volume = 0.3;
-        bgMusic.play().catch(e => {
-            showMessage('🎵 Нажми ещё раз для включения музыки', 'info');
-        });
-        document.getElementById('music-toggle').textContent = '🎵';
-        showMessage('🎵 Фоновая музыка включена', 'success');
-    }
-    
-    isMusicPlaying = !isMusicPlaying;
-}
-
 // Пасхалка с клавиатурой
 let secretCode = '';
 const targetCode = '1991';
@@ -352,10 +475,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     updateNav();
     
-    // Инициализация фоновой музыки только на главной
-    if (document.querySelector('.hero')) {
-        initBackgroundMusic();
-    }
+    // Инициализируем фоновую музыку на всех страницах
+    initBackgroundMusic();
+    createMusicControl();
     
     // Разблокировка аудио при любом клике
     document.addEventListener('click', unlockAudio);
