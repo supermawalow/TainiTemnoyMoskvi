@@ -9,12 +9,17 @@
 <body>
     <header>
         <div class="logo">
-            <h1>Тайны Тёмной Москвы</h1>
+            <h1 onclick="handleLogoClick()">Тайны Тёмной Москвы</h1>
         </div>
+        
+        <!-- Кнопка мобильного меню -->
+        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+        
         <nav class="main-nav">
             <a href="index.html">Главная</a>
             <a href="quiz.html">Начать Квиз</a>
-            <a href="register.html">Записаться на Квест</a>
+            <a href="quests.html">Выбрать Квест</a>
+            <a href="register.html">Записаться</a>
         </nav>
     </header>
 
@@ -28,59 +33,4 @@
             
             <div style="margin-top: 2rem; text-align: center;">
                 <button class="cta-button" onclick="retryQuiz()">Пройти ещё раз</button>
-                <button class="cta-button" onclick="goToRegistration()">Записаться на реальный квест</button>
-            </div>
-        </div>
-    </main>
-
-    <footer>
-        <p>© 2025 Тайны Тёмной Москвы. Создано с 💀</p>
-        <p> BY MEOWLENTII </p>
-    </footer>
-
-    <script src="js/script.js"></script>
-    <script>
-        // Показываем результаты когда страница загрузится
-        document.addEventListener('DOMContentLoaded', function() {
-            const score = loadFromLocalStorage('quizScore') || 0;
-            const totalQuestions = loadFromLocalStorage('totalQuestions') || 3;
-            const resultContent = document.getElementById('result-content');
-            
-            let resultHTML = `<h3>Ты ответил правильно на ${score} из ${totalQuestions} вопросов!</h3>`;
-            
-            // Разные сообщения в зависимости от результата
-            if (score === totalQuestions) {
-                resultHTML += `
-                    <p style="color: #b29700; font-size: 1.2rem; margin: 1rem 0;">
-                    🏆 Потрясающе! Ты настоящий эксперт по московским страшилкам!
-                    </p>
-                    <p>Ты готов к самому жуткому приключению в реальной жизни!</p>
-                `;
-            } else if (score >= totalQuestions / 2) {
-                resultHTML += `
-                    <p style="color: #b29700; font-size: 1.2rem; margin: 1rem 0;">
-                    👍 Неплохо! Ты многое знаешь, но Москва приготовила для тебя ещё сюрпризы!
-                    </p>
-                `;
-            } else {
-                resultHTML += `
-                    <p style="color: #b29700; font-size: 1.2rem; margin: 1rem 0;">
-                    💀 Страшно? Не переживай! У тебя есть шанс узнать больше на реальном квесте!
-                    </p>
-                `;
-            }
-            
-            resultContent.innerHTML = resultHTML;
-        });
-        
-        function retryQuiz() {
-            window.location.href = 'quiz.html';
-        }
-        
-        function goToRegistration() {
-            window.location.href = 'register.html';
-        }
-    </script>
-</body>
-
-</html>
+                <button class="cta-button secondary" onclick="goToQuests
